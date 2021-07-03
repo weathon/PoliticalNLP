@@ -15,7 +15,7 @@ max_length = 100
 trunc_type='post'
 padding_type='post'
 oov_tok = "<OOV>"
-training_size = 20000
+training_size = 66460
 with open("ExtractedTweets.csv", 'r') as f:
     datastore = f.read()
 
@@ -23,14 +23,17 @@ tags=[]
 texts=[]
 for i in datastore.split("\n")[1:]:
     row=i.split(",")
-    tags.append(row[0])
+    # print(row)
+    if row[0]=="":
+        continue
+    tags.append(int(row[0]))
     text=",".join(row[2:])
     texts.append(text)
 
-training_sentences = sentences[0:training_size]
-testing_sentences = sentences[training_size:]
-training_labels = labels[0:training_size]
-testing_labels = labels[training_size:]
+training_sentences = texts[0:training_size]
+testing_sentences = texts[training_size:]
+training_labels = tags[0:training_size]
+testing_labels = tags[training_size:]
 
 tokenizer = Tokenizer(num_words=vocab_size, oov_token=oov_tok)
 tokenizer.fit_on_texts(training_sentences)
@@ -62,27 +65,25 @@ num_epochs = 30
 history = model.fit(training_padded, training_labels, epochs=num_epochs, validation_data=(testing_padded, testing_labels), verbose=2)
 
 
-
-
-def plot_graphs(history, string):
-  plt.plot(history.history[string])
-  plt.plot(history.history['val_'+string])
-  plt.xlabel("Epochs")
-  plt.ylabel(string)
-  plt.legend([string, 'val_'+string])
-  plt.show()
+# def plot_graphs(history, string):
+#   plt.plot(history.history[string])
+#   plt.plot(history.history['val_'+string])
+#   plt.xlabel("Epochs")
+#   plt.ylabel(string)
+#   plt.legend([string, 'val_'+string])
+#   plt.show()
   
-plot_graphs(history, "accuracy")
-plot_graphs(history, "loss")
+# plot_graphs(history, "accuracy")
+# plot_graphs(history, "loss")
 
 reverse_word_index = dict([(value, key) for (key, value) in word_index.items()])
 
 def decode_sentence(text):
     return ' '.join([reverse_word_index.get(i, '?') for i in text])
 
-print(decode_sentence(training_padded[0]))
-print(training_sentences[2])
-print(labels[2])
+# print(decode_sentence(training_padded[0]))
+# print(training_sentences[2])
+# print(tags[2])
 
 e = model.layers[0]
 weights = e.get_weights()[0]
@@ -100,16 +101,8 @@ for word_num in range(1, vocab_size):
 out_v.close()
 out_m.close()
 
-try:
-  from google.colab import files
-except ImportError:
-  pass
-else:
-  files.download('vecs.tsv')
-  files.download('meta.tsv')
 
-
-sentence = ["granny starting to fear spiders in the garden might be real", "game of thrones season finale showing this sunday night"]
+sentence = ["We should cut the taxes. The left wing is trying to take away all the money from the people."]
 sequences = tokenizer.texts_to_sequences(sentence)
 padded = pad_sequences(sequences, maxlen=max_length, padding=padding_type, truncating=trunc_type)
 print(model.predict(padded))
