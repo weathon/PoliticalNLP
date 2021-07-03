@@ -1,9 +1,9 @@
 import json
-import tensorflow as tf
+# import tensorflow as tf
 
-from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-import csv
+# from tensorflow.keras.preprocessing.text import Tokenizer
+# from tensorflow.keras.preprocessing.sequence import pad_sequences
+# import csv
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,7 +16,7 @@ trunc_type='post'
 padding_type='post'
 oov_tok = "<OOV>"
 training_size = 66460
-with open("ExtractedTweets.csv", 'r') as f:
+with open("ExtractedTweets.csv", 'r', encoding='utf-8') as f:
     datastore = f.read()
 
 tags=[]
@@ -65,16 +65,16 @@ num_epochs = 30
 history = model.fit(training_padded, training_labels, epochs=num_epochs, validation_data=(testing_padded, testing_labels), verbose=2)
 
 
-# def plot_graphs(history, string):
-#   plt.plot(history.history[string])
-#   plt.plot(history.history['val_'+string])
-#   plt.xlabel("Epochs")
-#   plt.ylabel(string)
-#   plt.legend([string, 'val_'+string])
-#   plt.show()
+def plot_graphs(history, string):
+  plt.plot(history.history[string])
+  plt.plot(history.history['val_'+string])
+  plt.xlabel("Epochs")
+  plt.ylabel(string)
+  plt.legend([string, 'val_'+string])
+  plt.show()
   
-# plot_graphs(history, "accuracy")
-# plot_graphs(history, "loss")
+plot_graphs(history, "accuracy")
+plot_graphs(history, "loss")
 
 reverse_word_index = dict([(value, key) for (key, value) in word_index.items()])
 
