@@ -1,35 +1,74 @@
 import json
-# import tensorflow as tf
+import tensorflow as tf
 
-# from tensorflow.keras.preprocessing.text import Tokenizer
-# from tensorflow.keras.preprocessing.sequence import pad_sequences
-# import csv
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+import csv
 
 import numpy as np
 import matplotlib.pyplot as plt
+import os
+import random
 
+# with open("ExtractedTweets.csv", 'r', encoding='utf-8') as f:
+#     datastore = f.read()
 
-vocab_size = 10000
-embedding_dim = 16
+tags=[]
+texts=[]
+# for i in datastore.split("\n")[1:]:
+#     row=i.split(",")
+#     # print(row)
+#     if row[0]=="":
+#         continue
+#     tags.append(int(row[0]))
+#     text=",".join(row[2:])
+#     texts.append(text)
+
+words=[]
+
+for i in os.listdir("./Rep"):
+    with open("./Rep/"+i,"r", encoding='utf-8') as f:
+        for j in f.read().split("."):
+            # j=j.replace("?"," ").replace(","," ").replace("!"," ")
+            j=j.replace("?"," ").replace(","," ").replace("!"," ").replace(";"," ").replace("\""," ").replace("\n"," ").replace("\r"," ")
+
+            for k in j.split(" "):
+                if not k in words:
+                    words.append(k)
+            j+="."
+            tags.append(1)
+            texts.append(j)
+
+for i in os.listdir("./Dem"):
+    with open("./Dem/"+i,"r", encoding='utf-8') as f:
+        for j in f.read().split("."):
+            j=j.replace("?"," ").replace(","," ").replace("!"," ").replace(";"," ").replace("\""," ").replace("\n"," ").replace("\r"," ")
+
+            for k in j.split(" "):
+                if not k in words:
+                    words.append(k)
+            j+="."
+            tags.append(1)
+            texts.append(j)
+
+#  size budui 
+
+end=len(texts)
+for i in range(len(texts)):
+    string=""
+    for length in range(random.randint(7,20)):
+        string+=random.choice(words)+" "
+    tags.append(0)
+    texts.append(string)
+
+print(texts[end+1])
+vocab_size = int(len(words)*0.7)
+embedding_dim = 100
 max_length = 100
 trunc_type='post'
 padding_type='post'
 oov_tok = "<OOV>"
-training_size = 66460
-with open("ExtractedTweets.csv", 'r', encoding='utf-8') as f:
-    datastore = f.read()
-
-tags=[]
-texts=[]
-for i in datastore.split("\n")[1:]:
-    row=i.split(",")
-    # print(row)
-    if row[0]=="":
-        continue
-    tags.append(int(row[0]))
-    text=",".join(row[2:])
-    texts.append(text)
-
+training_size = int(len(tags)*0.8)
 training_sentences = texts[0:training_size]
 testing_sentences = texts[training_size:]
 training_labels = tags[0:training_size]
@@ -61,7 +100,7 @@ model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
 
 model.summary()
 
-num_epochs = 30
+num_epochs = 10
 history = model.fit(training_padded, training_labels, epochs=num_epochs, validation_data=(testing_padded, testing_labels), verbose=2)
 
 
@@ -102,7 +141,10 @@ out_v.close()
 out_m.close()
 
 
-sentence = ["We should cut the taxes. The left wing is trying to take away all the money from the people."]
-sequences = tokenizer.texts_to_sequences(sentence)
-padded = pad_sequences(sequences, maxlen=max_length, padding=padding_type, truncating=trunc_type)
-print(model.predict(padded))
+# sentence = ["We should cut the taxes. The left wing is trying to take away all the money from the people."]
+
+while 1:
+    s=input("> ")
+    sequences = tokenizer.texts_to_sequences([s])
+    padded = pad_sequences(sequences, maxlen=max_length, padding=padding_type, truncating=trunc_type)
+    print(model.predict(padded))
