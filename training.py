@@ -56,14 +56,24 @@ for i in os.listdir("./Dem"):
 end=len(texts)
 for i in range(len(texts)):
     string=""
-    for length in range(random.randint(7,20)):
+    for length in range(random.randint(5,15)):
         string+=random.choice(words)+" "
     tags.append(0)
     texts.append(string)
+    # print(string)
+
+
+for i in range(int(len(texts)/0.3)):
+    a=random.randint(0,len(texts)-1)
+    b=random.randint(0,len(texts)-1)
+    tags[a],tags[b]=tags[b],tags[a]
+    texts[a],texts[b]=texts[b],texts[a]
+
 
 print(texts[end+1])
 vocab_size = int(len(words)*0.7)
-embedding_dim = 100
+embedding_dim = 2
+
 max_length = 100
 trunc_type='post'
 padding_type='post'
@@ -94,6 +104,8 @@ model = tf.keras.Sequential([
     tf.keras.layers.Embedding(vocab_size, embedding_dim, input_length=max_length),
     tf.keras.layers.GlobalAveragePooling1D(),
     tf.keras.layers.Dense(24, activation='relu'),
+    tf.keras.layers.Dense(24, activation='relu'),
+    
     tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
