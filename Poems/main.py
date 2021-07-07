@@ -121,7 +121,7 @@ print("Prediction shape: ", example_batch_predictions.shape, " # (batch_size, se
 print("Mean loss:        ", mean_loss)
 
 model.compile(loss=loss, optimizer="adam")#yao loss buneng zichuan kunyun 3d
-EPOCHS = 5
+EPOCHS = 20
 # history = model.fit(dataset, epochs=EPOCHS, callbacks=[checkpoint_callback])
 # Directory where the checkpoints will be saved
 import os
@@ -140,12 +140,12 @@ print(model)
 
 
 def plot_graphs(history, string):
-  plt.plot(history.history[string])
+  plt.plot(history.history["loss"])
   plt.xlabel("Epochs")
   plt.ylabel(string)
   plt.show()
 
-plot_graphs(history, 'accuracy')
+plot_graphs(history, 'loss')
 
 
 
